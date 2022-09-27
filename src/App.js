@@ -1,38 +1,23 @@
 import "antd/dist/antd.css";
 import "./App.css";
 import { Button, Table, Modal, Input } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import axios from "axios";
 
 function App() {
   const [isEditing, setIsEditing] = useState(false);
   const [editingStudent, setEditingStudent] = useState(null);
-  const [dataSource, setDataSource] = useState([
-    {
-      id: 1,
-      name: "John",
-      email: "john@gmail.com",
-      address: "John Address",
-    },
-    {
-      id: 2,
-      name: "David",
-      email: "david@gmail.com",
-      address: "David Address",
-    },
-    {
-      id: 3,
-      name: "James",
-      email: "james@gmail.com",
-      address: "James Address",
-    },
-    {
-      id: 4,
-      name: "Sam",
-      email: "sam@gmail.com",
-      address: "Sam Address",
-    },
-  ]);
+  const [dataSource, setDataSource] = useState([]);
+
+  useEffect(() => {
+    const fetchAPI = async () => {
+      const respone = await axios.get("http://localhost:3330/user");
+      // console.log("respone", respone.data);
+      setDataSource(respone.data);
+    };
+    fetchAPI();
+  }, []);
   const columns = [
     {
       key: "1",
@@ -102,6 +87,8 @@ function App() {
     });
   };
   const onEditStudent = (record) => {
+    console.log("record", record);
+
     setIsEditing(true);
     setEditingStudent({ ...record });
   };
@@ -125,6 +112,11 @@ function App() {
             setDataSource((pre) => {
               return pre.map((student) => {
                 if (student.id === editingStudent.id) {
+                  console.log("editingStudent", editingStudent);
+                  axios.put(
+                    `http://localhost:3330/user/${editingStudent.id}`,
+                    editingStudent
+                  );
                   return editingStudent;
                 } else {
                   return student;
